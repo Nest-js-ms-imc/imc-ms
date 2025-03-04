@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:16.2
+    restart: always
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - '5434:5432'
+    environment:
+      - POSTGRES_PASSWORD=M1S3Cr37P4s5w0rd
+      - POSTGRES_DB=ImcDB
+    container_name: imcdb
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstackImc
+    environment:
+      - SERVICES=secretsmanager,ssm
+      - DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4567
+    ports:
+      - '4567:4567'
+      - '4571:4571'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
