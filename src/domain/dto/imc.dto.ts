@@ -4,4 +4,6 @@ export class ImcDomainDto {
   weight: number;
   imc: number;
   userId: string;
+  createdAt: Date;
+  position: number;
 }

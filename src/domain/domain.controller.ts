@@ -5,7 +5,7 @@ import { ImcDomainDto, RecordImcDto } from './dto';
 import { ImcEntity } from './entities/imc.entity';
 
 export class DomainController extends Domain {
-  createImc(data: RecordImcDto): ImcDomainDto {
+  createImc(data: RecordImcDto): Omit<ImcDomainDto, 'createdAt'> {
     const imc = new ImcEntity(data);
 
     if (!imc.isValid()) {

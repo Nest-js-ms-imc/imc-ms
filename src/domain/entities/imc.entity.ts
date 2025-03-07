@@ -4,6 +4,7 @@ export class ImcEntity {
   weight: number;
   imc: number;
   userId: string;
+  position: number;
   private readonly _errors: Map<string, boolean>;
 
   constructor(data?: {
@@ -12,6 +13,7 @@ export class ImcEntity {
     weight?: number;
     imc?: number;
     userId?: string;
+    position?: number;
   }) {
     this._errors = new Map();
 
@@ -20,6 +22,7 @@ export class ImcEntity {
     if (data?.weight) this.weight = data.weight;
     if (data?.imc) this.imc = data.imc;
     if (data?.userId) this.userId = data.userId;
+    if (data?.position) this.position = data.position;
   }
 
   public create(data: {

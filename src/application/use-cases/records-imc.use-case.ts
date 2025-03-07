@@ -42,11 +42,14 @@ export class RecordsImcUseCase {
 
     imcDto.map((imc) => {
       const imcApp = new ImcApplicationDto();
-      imcApp.id = imc.id;
+
+      // imcApp.id = imc.id;
+      imcApp.createdAt = imc.createdAt;
       imcApp.height = imc.height;
       imcApp.weight = imc.weight;
       imcApp.imc = Number(imc.imc.toFixed(1));
-      imcApp.userId = imc.userId;
+      imcApp.position = imc.position;
+      // imcApp.userId = imc.userId;
 
       registers.push(imcApp);
     });

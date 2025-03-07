@@ -12,14 +12,15 @@ export class ImcModel implements IImcModel {
   @Column('int')
   weight: number;
 
+  @Column('int')
+  position: number;
+
   @Column('float')
   imc: number;
 
   @Column('text')
   userId: string;
 
-  @Column('date', {
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Column('date')
   createdAt: Date;
 }

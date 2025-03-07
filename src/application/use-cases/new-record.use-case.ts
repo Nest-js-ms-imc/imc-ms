@@ -16,9 +16,7 @@ export class NewRecordImcUseCase {
     const newImc = this.mapImcDtoToDomain(newRecordImcDto);
 
     const data = await this.domainController.createImc(newImc);
-
     const imc = this.mapImcDtoToPersistence(data);
-
     const imcDto = await this.imcRepository.recordImc(imc);
 
     const answer = this.mapImcDtoToApplication(imcDto);
@@ -48,11 +46,14 @@ export class NewRecordImcUseCase {
 
   private mapImcDtoToApplication(imcDto: IImcModel): ImcApplicationDto {
     const imc = new ImcApplicationDto();
-    imc.id = imcDto.id;
+
+    // imc.id = imcDto.id;
     imc.height = imcDto.height;
     imc.weight = imcDto.weight;
     imc.imc = Number(imcDto.imc.toFixed(1));
-    imc.userId = imcDto.userId;
+    // imc.userId = imcDto.userId;
+    imc.position = imcDto.position;
+
     return imc;
   }
 }

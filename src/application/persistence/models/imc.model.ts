@@ -5,4 +5,5 @@ export interface IImcModel {
   weight: number;
   imc: number;
   userId: string;
+  position: number;
 }
