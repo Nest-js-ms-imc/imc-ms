@@ -3,4 +3,5 @@ export class ImcDomainDto {
   height: number;
   weight: number;
   imc: number;
+  userId: string;
 }

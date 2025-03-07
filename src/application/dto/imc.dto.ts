@@ -3,4 +3,5 @@ export class ImcApplicationDto {
   height: number;
   weight: number;
   imc: number;
+  userId: string;
 }

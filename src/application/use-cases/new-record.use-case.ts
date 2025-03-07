@@ -1,33 +1,38 @@
 import { IImcRepository } from '../persistence/repositories/imc.repository';
 import { IImcModel } from '../persistence/models/imc.model';
-import { ImcApplicationDto, NewImcApplicationDto } from '../dto';
+import { ImcApplicationDto, NewRecordImcApplicationDto } from '../dto';
 import { Domain } from '../../domain/domain.interface';
-import { CreateImcDomainDto } from '../../domain/dto/create-imc.dto';
+import { CreateImcDomainDto } from '../../domain/dto/create-record.dto';
 
-export class NewImcUseCase {
+export class NewRecordImcUseCase {
   constructor(
     private readonly imcRepository: IImcRepository<IImcModel>,
     private readonly domainController: Domain,
   ) {}
 
-  async execute(newImcDto: NewImcApplicationDto): Promise<ImcApplicationDto> {
-    const newImc = this.mapImcDtoToDomain(newImcDto);
+  async execute(
+    newRecordImcDto: NewRecordImcApplicationDto,
+  ): Promise<ImcApplicationDto> {
+    const newImc = this.mapImcDtoToDomain(newRecordImcDto);
 
-    const data = this.domainController.createImc(newImc);
+    const data = await this.domainController.createImc(newImc);
 
     const imc = this.mapImcDtoToPersistence(data);
 
-    const imcDto = await this.imcRepository.registerImc(imc);
+    const imcDto = await this.imcRepository.recordImc(imc);
 
     const answer = this.mapImcDtoToApplication(imcDto);
     return answer;
   }
 
-  private mapImcDtoToDomain(imcDto: NewImcApplicationDto): CreateImcDomainDto {
+  private mapImcDtoToDomain(
+    imcDto: NewRecordImcApplicationDto,
+  ): CreateImcDomainDto {
     const imc = new CreateImcDomainDto();
     imc.height = imcDto.height;
     imc.weight = imcDto.weight;
-    imc.imc = imcDto.imc;
+    // imc.imc = imcDto.imc;
+    imc.userId = imcDto.userId;
     return imc;
   }
 
@@ -36,7 +41,8 @@ export class NewImcUseCase {
     imc.id = imcDto.id;
     imc.height = imcDto.height;
     imc.weight = imcDto.weight;
-    imc.imc = imcDto.imc;
+    // imc.imc = imcDto.imc;
+    imc.userId = imcDto.userId;
     return imc;
   }
 
@@ -45,7 +51,8 @@ export class NewImcUseCase {
     imc.id = imcDto.id;
     imc.height = imcDto.height;
     imc.weight = imcDto.weight;
-    imc.imc = imcDto.imc;
+    imc.imc = Number(imcDto.imc.toFixed(1));
+    imc.userId = imcDto.userId;
     return imc;
   }
 }

@@ -4,4 +4,5 @@ export interface IImcModel {
   height: number;
   weight: number;
   imc: number;
+  userId: string;
 }

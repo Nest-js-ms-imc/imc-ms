@@ -2,19 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
-import { UserModel } from './models/user.model';
-import { UserRepository } from './repositories/user.repository';
-import { PasswordHashService } from '../services/password-hash.service';
 import { EnvsService } from '../secrets/envs.service';
 import { SecretsModule } from '../secrets/aws-secrets.module';
+import { ImcModel } from './models/imc.model';
+import { ImcRepository } from './repositories/imc.repository';
 
 describe('PersistenceModule', () => {
   let module: TestingModule;
-  let userRepository: UserRepository;
+  let imcRepository: ImcRepository;
   let envsServiceMock: Partial<EnvsService>;
-  let userRepositoryMock: Partial<
-    Record<keyof Repository<UserModel>, jest.Mock>
-  >;
+  let imcRepositoryMock: Partial<Record<keyof Repository<ImcModel>, jest.Mock>>;
   let dataSourceMock: Partial<DataSource>;
 
   beforeEach(async () => {
@@ -32,14 +29,14 @@ describe('PersistenceModule', () => {
       loadSecrets: jest.fn().mockResolvedValue(undefined),
     };
 
-    userRepositoryMock = {
+    imcRepositoryMock = {
       findOne: jest.fn(),
       save: jest.fn(),
       createQueryBuilder: jest.fn(),
     };
 
     dataSourceMock = {
-      getRepository: jest.fn().mockReturnValue(userRepositoryMock),
+      getRepository: jest.fn().mockReturnValue(imcRepositoryMock),
       createQueryRunner: jest
         .fn()
         .mockReturnValue({ connect: jest.fn(), release: jest.fn() }),
@@ -48,18 +45,17 @@ describe('PersistenceModule', () => {
     module = await Test.createTestingModule({
       imports: [SecretsModule],
       providers: [
-        UserRepository,
-        PasswordHashService,
+        ImcRepository,
         { provide: EnvsService, useValue: envsServiceMock },
         {
-          provide: getRepositoryToken(UserModel),
-          useValue: userRepositoryMock,
+          provide: getRepositoryToken(ImcModel),
+          useValue: imcRepositoryMock,
         },
         { provide: DataSource, useValue: dataSourceMock },
       ],
     }).compile();
 
-    userRepository = module.get<UserRepository>(UserRepository);
+    imcRepository = module.get<ImcRepository>(ImcRepository);
   });
 
   it('module should be defined', () => {
@@ -67,6 +63,6 @@ describe('PersistenceModule', () => {
   });
 
   it('should get an instance of the UserRepository', () => {
-    expect(userRepository).toBeDefined();
+    expect(imcRepository).toBeDefined();
   });
 });

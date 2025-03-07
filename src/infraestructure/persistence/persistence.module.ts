@@ -15,12 +15,12 @@ import { SecretsModule } from '../secrets/aws-secrets.module';
       useFactory: async (envsService: EnvsService) => {
         await envsService.loadSecrets();
 
-        console.log('🟢 EnvsService en PersistenceModule:', envsService);
-        console.log('🟢 DB_HOST:', envsService.get('DB_HOST'));
-        console.log('🟢 DB_PORT:', envsService.get('DB_PORT'));
-        console.log('🟢 DB_USERNAME:', envsService.get('DB_USERNAME'));
-        console.log('🟢 DB_PASSWORD:', envsService.get('DB_PASSWORD'));
-        console.log('🟢 DB_NAME:', envsService.get('DB_NAME'));
+        // console.log('🟢 EnvsService en PersistenceModule:', envsService);
+        // console.log('🟢 DB_HOST:', envsService.get('DB_HOST'));
+        // console.log('🟢 DB_PORT:', envsService.get('DB_PORT'));
+        // console.log('🟢 DB_USERNAME:', envsService.get('DB_USERNAME'));
+        // console.log('🟢 DB_PASSWORD:', envsService.get('DB_PASSWORD'));
+        // console.log('🟢 DB_NAME:', envsService.get('DB_NAME'));
 
         return {
           type: 'postgres',

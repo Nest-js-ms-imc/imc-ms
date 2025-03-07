@@ -6,14 +6,17 @@ export class ImcModel implements IImcModel {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('number')
+  @Column('float')
   height: number;
 
-  @Column('number')
+  @Column('int')
   weight: number;
 
-  @Column('number')
+  @Column('float')
   imc: number;
+
+  @Column('text')
+  userId: string;
 
   @Column('date', {
     default: () => 'CURRENT_TIMESTAMP',

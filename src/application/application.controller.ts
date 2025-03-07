@@ -1,9 +1,10 @@
 import { Application } from './application.interface';
 import { ImcApplicationDto } from './dto';
-import { NewImcUseCase } from './use-cases/new-imc.use-case';
+import { NewRecordImcUseCase } from './use-cases/new-record.use-case';
 import { IImcRepository } from './persistence/repositories/imc.repository';
 import { IImcModel } from './persistence/models/imc.model';
 import { Domain } from '../domain/domain.interface';
+import { RecordsImcUseCase } from './use-cases/records-imc.use-case';
 
 export class ApplicationController extends Application {
   constructor(
@@ -13,15 +14,21 @@ export class ApplicationController extends Application {
     super();
   }
 
-  newImcCalc(
+  newRecordImcCalc(
     height: number,
     weight: number,
-    imc: number,
+    // imc: number,
+    userId: string,
   ): Promise<ImcApplicationDto> {
-    const useCase = new NewImcUseCase(
+    const useCase = new NewRecordImcUseCase(
       this.imcRepository,
       this.domainController,
     );
-    return useCase.execute({ height, weight, imc });
+    return useCase.execute({ height, weight, userId });
+  }
+
+  listRecordsImc(id: string): Promise<ImcApplicationDto[]> {
+    const useCase = new RecordsImcUseCase(this.imcRepository);
+    return useCase.execute({ id });
   }
 }

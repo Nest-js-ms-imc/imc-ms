@@ -5,7 +5,10 @@ import { Repository } from 'typeorm';
 
 import { ImcModel } from '../models/imc.model';
 import { IImcRepository } from '../../../application/persistence/repositories/imc.repository';
-import { ImcApplicationDto } from '../../../application/dto';
+import {
+  ImcApplicationDto,
+  ListRecordsImcApplicationDto,
+} from '../../../application/dto';
 
 @Injectable()
 export class ImcRepository implements IImcRepository<ImcModel> {
@@ -14,9 +17,9 @@ export class ImcRepository implements IImcRepository<ImcModel> {
     readonly repository: Repository<ImcModel>,
   ) {}
 
-  async registerImc(imc: ImcApplicationDto): Promise<ImcModel> {
+  async recordImc(imc: ImcApplicationDto): Promise<ImcModel> {
     try {
-      const data = this.mapImcApplicationDtoToUserModel(imc);
+      const data = this.mapImcApplicationDtoToImcModel(imc);
 
       return await this.repository.save(data);
     } catch (err) {
@@ -27,12 +30,21 @@ export class ImcRepository implements IImcRepository<ImcModel> {
     }
   }
 
-  private mapImcApplicationDtoToUserModel(data: ImcApplicationDto): ImcModel {
+  async findRecordsById(
+    user: ListRecordsImcApplicationDto,
+  ): Promise<ImcModel[]> {
+    return await this.repository.findBy({ userId: user.id });
+  }
+
+  private mapImcApplicationDtoToImcModel(data: ImcApplicationDto): ImcModel {
     const imc = new ImcModel();
+    const height = data.height;
+    //TODO: Falta pruebas unitarias + Posición de IMC frente a otros usuarios
     imc.id = data.id;
-    imc.height = data.height;
+    imc.height = height;
     imc.weight = data.weight;
-    imc.imc = data.imc;
+    imc.userId = data.userId;
+    imc.imc = data.weight / (height * height);
     return imc;
   }
 }

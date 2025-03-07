@@ -8,7 +8,7 @@ describe('UserModel Repository', () => {
   let userRepository: Repository<UserModel>;
 
   const mockUser = {
-    id: '123e4567-e89b-12d3-a456-426614174000',
+    id: '123e4566-e89b-12d3-a456-426614174000',
     name: 'John Doe',
     email: 'johndoe@example.com',
     password: 'hashed_password',

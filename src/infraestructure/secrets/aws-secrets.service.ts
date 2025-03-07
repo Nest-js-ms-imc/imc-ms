@@ -29,7 +29,7 @@ export class AwsSecretsService implements SecretsService, OnModuleInit {
       const response = await this.client.send(command);
 
       if (response.SecretString) {
-        console.log('🟢 Respuesta completa de Secrets Manager:', response);
+        // console.log('🟢 Respuesta completa de Secrets Manager:', response);
 
         return response.SecretString;
       }
@@ -43,8 +43,8 @@ export class AwsSecretsService implements SecretsService, OnModuleInit {
   }
 
   async onModuleInit() {
-    // await this.getSecret('imc-secrets');
-    const secrets = await this.getSecret('imc-secrets');
-    console.log('secrets loaded: ', secrets);
+    await this.getSecret('imc-secrets');
+    // const secrets = await this.getSecret('imc-secrets');
+    // console.log('secrets loaded: ', secrets);
   }
 }

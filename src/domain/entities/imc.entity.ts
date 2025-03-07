@@ -3,6 +3,7 @@ export class ImcEntity {
   height: number;
   weight: number;
   imc: number;
+  userId: string;
   private readonly _errors: Map<string, boolean>;
 
   constructor(data?: {
@@ -10,6 +11,7 @@ export class ImcEntity {
     height?: number;
     weight?: number;
     imc?: number;
+    userId?: string;
   }) {
     this._errors = new Map();
 
@@ -17,12 +19,19 @@ export class ImcEntity {
     if (data?.height) this.height = data.height;
     if (data?.weight) this.weight = data.weight;
     if (data?.imc) this.imc = data.imc;
+    if (data?.userId) this.userId = data.userId;
   }
 
-  public create(data: { height: number; weight: number; imc: number }): this {
+  public create(data: {
+    height: number;
+    weight: number;
+    // imc: number;
+    userId: string;
+  }): this {
     this.height = data.height;
     this.weight = data.weight;
-    this.imc = data.imc;
+    // this.imc = data.imc;
+    this.userId = data.userId;
     return this;
   }
 
@@ -37,6 +46,10 @@ export class ImcEntity {
 
     if (!this.imc) {
       this._errors.set('imc', false);
+    }
+
+    if (!this.userId) {
+      this._errors.set('userId', false);
     }
 
     return this;
