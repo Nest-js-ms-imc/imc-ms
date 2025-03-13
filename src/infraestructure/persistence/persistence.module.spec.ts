@@ -62,7 +62,7 @@ describe('PersistenceModule', () => {
     expect(module).toBeDefined();
   });
 
-  it('should get an instance of the UserRepository', () => {
+  it('should get an instance of the ImcRepository', () => {
     expect(imcRepository).toBeDefined();
   });
 });

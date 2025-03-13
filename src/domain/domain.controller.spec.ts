@@ -1,20 +1,9 @@
 import { DomainController } from './domain.controller';
-import { CreateUserDomainDto } from './dto/create-user.dto';
-import { UserEntity } from './entities/user.entity';
-import { IPasswordHashDomainService } from './services/password-hash.service';
-import { IUserDomainService } from './services/user.service';
+import { CreateImcDomainDto } from './dto';
+import { ImcEntity } from './entities/imc.entity';
 import { InvalidDataException } from './exceptions/invalid-data.exception';
 
-const mockPasswordHashService: IPasswordHashDomainService = {
-  hash: jest.fn().mockResolvedValue('hashed_password'),
-  compare: jest.fn().mockResolvedValue(true),
-};
-
-const mockUserService: IUserDomainService = {
-  validateUserAndPassword: jest.fn().mockResolvedValue(null),
-};
-
-jest.mock('./entities/user.entity');
+jest.mock('./entities/imc.entity');
 
 describe('DomainController', () => {
   let controller: DomainController;
@@ -24,38 +13,38 @@ describe('DomainController', () => {
     jest.clearAllMocks();
   });
 
-  describe('createUser', () => {
-    it('Should create user', () => {
-      const mockData: CreateUserDomainDto = {
-        name: 'Juan Test',
-        email: 'test@example.com',
-        password: '123456',
+  describe('createRecordImc', () => {
+    it('Should create Imc', () => {
+      const mockData: CreateImcDomainDto = {
+        height: 1.6,
+        weight: 80,
+        userId: '123456',
       };
 
-      const mockUser = {
+      const mockImc = {
         validate: jest.fn(),
         isValid: jest.fn().mockReturnValue(true),
-        create: jest.fn().mockReturnValue({ email: mockData.email }),
+        create: jest.fn().mockReturnValue({ height: mockData.height }),
       };
 
-      (UserEntity as jest.Mock).mockImplementation(() => mockUser);
+      (ImcEntity as jest.Mock).mockImplementation(() => mockImc);
 
-      const result = controller.createUser(mockData, mockPasswordHashService);
+      const result = controller.createImc(mockData);
 
-      expect(result).toEqual({ email: mockData.email });
-      expect(mockUser.validate).toHaveBeenCalled();
-      expect(mockUser.isValid).toHaveBeenCalled();
-      expect(mockUser.create).toHaveBeenCalledWith(mockData);
+      expect(result).toEqual({ height: mockData.height });
+      expect(mockImc.validate).toHaveBeenCalled();
+      expect(mockImc.isValid).toHaveBeenCalled();
+      expect(mockImc.create).toHaveBeenCalledWith(mockData);
     });
 
     it('Should launch InvalidDataException', () => {
-      const mockData: CreateUserDomainDto = {
-        name: 'Juan test',
-        email: 'test@example',
-        password: '123',
+      const mockData: CreateImcDomainDto = {
+        height: 1.6,
+        weight: 80,
+        userId: '123456',
       };
 
-      const mockUser = {
+      const mockImc = {
         validate: jest.fn(),
         isValid: jest.fn().mockReturnValue(false),
         getErrors: jest
@@ -63,68 +52,11 @@ describe('DomainController', () => {
           .mockReturnValue(['Invalid email', 'Invalid password']),
       };
 
-      (UserEntity as jest.Mock).mockImplementation(() => mockUser);
+      (ImcEntity as jest.Mock).mockImplementation(() => mockImc);
 
       expect(() => {
-        controller.createUser(mockData, mockPasswordHashService);
+        controller.createImc(mockData);
       }).toThrow(InvalidDataException);
-    });
-  });
-
-  describe('signIn', () => {
-    it('Should signIn', async () => {
-      const mockEmail = 'test@example.com';
-      const mockPassword = '123456';
-
-      const mockUser = {
-        validate: jest.fn(),
-        isValid: jest.fn().mockReturnValue(true),
-        signIn: jest.fn().mockResolvedValue({
-          user: { id: 1, email: mockEmail },
-          token: 'mock_token',
-        }),
-      };
-
-      (UserEntity as jest.Mock).mockImplementation(() => mockUser);
-
-      const result = await controller.signIn(
-        mockEmail,
-        mockPassword,
-        mockUserService,
-        mockPasswordHashService,
-      );
-
-      expect(result).toEqual({
-        user: { id: 1, email: mockEmail },
-        token: 'mock_token',
-      });
-      expect(mockUser.validate).toHaveBeenCalled();
-      expect(mockUser.isValid).toHaveBeenCalled();
-      expect(mockUser.signIn).toHaveBeenCalledWith(mockUserService);
-    });
-
-    it('Should launch InvalidDataException', async () => {
-      const mockEmail = '';
-      const mockPassword = '';
-
-      const mockUser = {
-        validate: jest.fn(),
-        isValid: jest.fn().mockReturnValue(false),
-        getErrors: jest
-          .fn()
-          .mockReturnValue(['Invalid email', 'Invalid password']),
-      };
-
-      (UserEntity as jest.Mock).mockImplementation(() => mockUser);
-
-      await expect(async () => {
-        await controller.signIn(
-          mockEmail,
-          mockPassword,
-          mockUserService,
-          mockPasswordHashService,
-        );
-      }).rejects.toThrow(InvalidDataException);
     });
   });
 });

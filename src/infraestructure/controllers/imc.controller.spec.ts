@@ -1,107 +1,83 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthController } from './security.controller';
 import { Application } from '../../application/application.interface';
-import { PasswordHashService } from '../services/password-hash.service';
-import { JwtService } from '../services/jwt.service';
-import { UserService } from '../services/user.service';
-import { RegisterUserDto, LoginUserDto } from '../../domain/dto';
+import { ImcController } from './imc.controller';
+import { RecordImcDto, RecordsImcDomainDto } from '../../domain/dto';
 
-describe('AuthController', () => {
-  let authController: AuthController;
+describe('ImcController', () => {
+  let imcController: ImcController;
   let applicationMock: jest.Mocked<Application>;
-  let jwtServiceMock: jest.Mocked<JwtService>;
-  let userServiceMock: jest.Mocked<UserService>;
-  let passwordHashServiceMock: jest.Mocked<PasswordHashService>;
 
   beforeEach(async () => {
     applicationMock = {
-      newUser: jest.fn().mockResolvedValue({ success: true }),
-      login: jest.fn().mockResolvedValue({ token: 'mocked_token' }),
+      registerImc: jest.fn().mockResolvedValue({ success: true }),
+      listRecords: jest.fn().mockResolvedValue({ token: 'mocked_token' }),
     } as any;
 
-    jwtServiceMock = {} as any;
-    userServiceMock = {} as any;
-    passwordHashServiceMock = {} as any;
-
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
-      providers: [
-        { provide: Application, useValue: applicationMock },
-        { provide: JwtService, useValue: jwtServiceMock },
-        { provide: UserService, useValue: userServiceMock },
-        { provide: PasswordHashService, useValue: passwordHashServiceMock },
-      ],
+      controllers: [ImcController],
+      providers: [{ provide: Application, useValue: applicationMock }],
     }).compile();
 
-    authController = module.get<AuthController>(AuthController);
+    imcController = module.get<ImcController>(ImcController);
   });
 
-  it('should register a user', async () => {
-    const dto: RegisterUserDto = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      password: 'password123',
+  it('should record a imc', async () => {
+    const dto: RecordImcDto = {
+      height: 1.6,
+      weight: 80,
+      userId: '123456',
     };
-    const result = await authController.registerUser(dto);
+    const result = await imcController.registerImc(dto);
 
-    expect(applicationMock.newUser).toHaveBeenCalledWith(
-      dto.name,
-      dto.email,
-      dto.password,
-      passwordHashServiceMock,
+    expect(applicationMock.newRecordImcCalc).toHaveBeenCalledWith(
+      dto.height,
+      dto.weight,
+      dto.userId,
     );
     expect(result).toEqual({ success: true });
   });
 
-  it('should login a user', async () => {
-    const dto: LoginUserDto = {
-      email: 'john@example.com',
-      password: 'password123',
+  it('should display the list of records', async () => {
+    const dto: RecordsImcDomainDto = {
+      id: '123456',
     };
-    const result = await authController.loginUser(dto);
+    const result = await imcController.listRecords(dto);
 
-    expect(applicationMock.login).toHaveBeenCalledWith(
-      dto.email,
-      dto.password,
-      jwtServiceMock,
-      userServiceMock,
-      passwordHashServiceMock,
-    );
+    expect(applicationMock.listRecordsImc).toHaveBeenCalledWith(dto.id);
     expect(result).toEqual({ token: 'mocked_token' });
   });
 
-  it('should handle errors in loginUser', async () => {
-    const loginDto: LoginUserDto = {
-      email: 'john@example.com',
-      password: 'securepassword',
+  it('should handle errors in list of records', async () => {
+    const dto: RecordsImcDomainDto = {
+      id: '123456',
     };
 
-    const error = new Error('Login failed');
-    applicationMock.login.mockRejectedValue(error);
+    const error = new Error('No records');
+    applicationMock.listRecordsImc.mockRejectedValue(error);
 
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    await authController.loginUser(loginDto);
+    await imcController.listRecords(dto);
 
     expect(console.error).toHaveBeenCalledWith(error);
   });
 
-  it('should handle errors in registerUser and log them', async () => {
-    const registerDto: RegisterUserDto = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      password: 'securepassword',
+  it('should handle errors in new record imc and log them', async () => {
+    const registerDto: RecordImcDto = {
+      height: 1.6,
+      weight: 80,
+      userId: '123456',
     };
 
-    const error = new Error('User registration failed');
-    applicationMock.newUser.mockRejectedValue(error);
+    const error = new Error('Record imc failed');
+    applicationMock.newRecordImcCalc.mockRejectedValue(error);
 
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    await authController.registerUser(registerDto);
+    await imcController.registerImc(registerDto);
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(error, registerDto);
 

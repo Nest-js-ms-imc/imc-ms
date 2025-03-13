@@ -1,28 +1,21 @@
-import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { JwtService } from './services/jwt.service';
-import { PasswordHashService } from './services/password-hash.service';
-import { UserService } from './services/user.service';
-import { UserRepository } from './persistence/repositories/user.repository';
-import { AuthController } from './controllers/security.controller';
 import { EnvsService } from './secrets/envs.service';
 import { SecretsModule } from './secrets/aws-secrets.module';
 import { ApplicationController } from '../application/application.controller';
 import { Application } from '../application/application.interface';
 import { Domain } from '../domain/domain.interface';
-import { UserModel } from './persistence/models/user.model';
+import { ImcRepository } from './persistence/repositories/imc.repository';
+import { ImcController } from './controllers/imc.controller';
+import { ImcModel } from './persistence/models/imc.model';
 
 jest.mock('./persistence/repositories/user.repository');
 
 describe('InfraestructureModule', () => {
   let module: TestingModule;
-  let userRepository: UserRepository;
-  let jwtService: JwtService;
-  let passwordHashService: PasswordHashService;
-  let userService: UserService;
+  let imcRepository: ImcRepository;
   let envsService: EnvsService;
   let envsServiceMock: jest.Mocked<EnvsService>;
 
@@ -36,14 +29,9 @@ describe('InfraestructureModule', () => {
     } as any;
 
     module = await Test.createTestingModule({
-      imports: [
-        SecretsModule,
-      ],
-      controllers: [AuthController],
+      imports: [SecretsModule],
+      controllers: [ImcController],
       providers: [
-        JwtService,
-        PasswordHashService,
-        UserService,
         {
           provide: EnvsService,
           useValue: envsService,
@@ -56,16 +44,16 @@ describe('InfraestructureModule', () => {
         },
         {
           provide: Application,
-          useFactory: (userRepo: UserRepository, domain: Domain) =>
+          useFactory: (userRepo: ImcRepository, domain: Domain) =>
             new ApplicationController(userRepo, domain),
-          inject: [UserRepository, Domain],
+          inject: [ImcRepository, Domain],
         },
         {
-          provide: getRepositoryToken(UserModel),
+          provide: getRepositoryToken(ImcModel),
           useClass: Repository,
         },
         {
-          provide: UserRepository,
+          provide: ImcRepository,
           useValue: {
             findOne: jest.fn(),
             save: jest.fn(),
@@ -75,7 +63,7 @@ describe('InfraestructureModule', () => {
         },
       ],
     })
-      .overrideProvider(UserRepository)
+      .overrideProvider(ImcRepository)
       .useValue({
         findOne: jest.fn(),
         save: jest.fn(),
@@ -96,22 +84,19 @@ describe('InfraestructureModule', () => {
         }),
         loadSecrets: jest.fn().mockResolvedValue(undefined),
       })
-      .overrideProvider(getRepositoryToken(UserModel))
+      .overrideProvider(getRepositoryToken(ImcModel))
       .useValue({
         find: jest.fn(),
         save: jest.fn(),
       })
-      .overrideProvider(UserRepository)
+      .overrideProvider(ImcRepository)
       .useValue({
         findOne: jest.fn(),
         save: jest.fn(),
       })
       .compile();
 
-    userRepository = module.get<UserRepository>(UserRepository);
-    jwtService = module.get<JwtService>(JwtService);
-    passwordHashService = module.get<PasswordHashService>(PasswordHashService);
-    userService = module.get<UserService>(UserService);
+    imcRepository = module.get<ImcRepository>(ImcRepository);
     envsService = module.get<EnvsService>(EnvsService);
   });
 
@@ -119,19 +104,7 @@ describe('InfraestructureModule', () => {
     expect(module).toBeDefined();
   });
 
-  it('should have UserRepository defined', () => {
-    expect(userRepository).toBeDefined();
-  });
-
-  it('should have JwtService defined', () => {
-    expect(jwtService).toBeDefined();
-  });
-
-  it('should have PasswordHashService defined', () => {
-    expect(passwordHashService).toBeDefined();
-  });
-
-  it('should have UserService defined', () => {
-    expect(userService).toBeDefined();
+  it('should have ImcRepository defined', () => {
+    expect(imcRepository).toBeDefined();
   });
 });

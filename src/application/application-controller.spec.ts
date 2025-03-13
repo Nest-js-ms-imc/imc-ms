@@ -1,89 +1,66 @@
-import { IPasswordHashDomainService } from '@/domain/services/password-hash.service';
-import { IUserDomainService } from '@/domain/services/user.service';
 import { ApplicationController } from './application.controller';
-import { IUserModel } from './persistence/models/user.model';
-import { IUserRepository } from './persistence/repositories/user.repository';
-import { IJwtApplicationService } from './service/jwt.service';
-import { NewUserUseCase } from './use-cases/new-user.use-case';
-import { SignInUseCase } from './use-cases/sign-in.use-case';
+import { NewRecordImcUseCase } from './use-cases/new-record.use-case';
+import { RecordsImcUseCase } from './use-cases/records-imc.use-case';
 import { Domain } from '../domain/domain.interface';
+import { IImcRepository } from './persistence/repositories/imc.repository';
+import { IImcModel } from './persistence/models/imc.model';
 
-jest.mock('./use-cases/new-user.use-case');
-jest.mock('./use-cases/sign-in.use-case');
+jest.mock('./use-cases/new-record.use-case');
+jest.mock('./use-cases/records-imc.use-case');
 
 describe('ApplicationController', () => {
   let controller: ApplicationController;
-  let mockUserRepository: jest.Mocked<IUserRepository<IUserModel>>;
+  let mockImcRepository: jest.Mocked<IImcRepository<IImcModel>>;
   let mockDomainController: jest.Mocked<Domain>;
-  let mockPasswordHashService: jest.Mocked<IPasswordHashDomainService>;
-  let mockJwtService: jest.Mocked<IJwtApplicationService>;
-  let mockUserService: jest.Mocked<IUserDomainService>;
 
   beforeEach(() => {
-    mockUserRepository = {
+    mockImcRepository = {
       save: jest.fn(),
       findOne: jest.fn(),
       findAll: jest.fn(),
-    } as unknown as jest.Mocked<IUserRepository<IUserModel>>;
+    } as unknown as jest.Mocked<IImcRepository<IImcModel>>;
 
     mockDomainController = {} as jest.Mocked<Domain>;
-    mockPasswordHashService = {
-      hash: jest.fn(),
-      compare: jest.fn(),
-    } as jest.Mocked<IPasswordHashDomainService>;
-    mockJwtService = {
-      sign: jest.fn(),
-      generateToken: jest.fn(),
-      verifyToken: jest.fn(),
-    } as jest.Mocked<IJwtApplicationService>;
-    mockUserService = {} as jest.Mocked<IUserDomainService>;
 
     controller = new ApplicationController(
-      mockUserRepository,
+      mockImcRepository,
       mockDomainController,
     );
   });
 
-  describe('newUser', () => {
-    it('should create a new user', async () => {
-      const mockUserDto = {
-        name: 'Test User',
-        email: 'test@example.com',
-        password: '123456',
+  describe('new-record', () => {
+    it('should create a new record imc', async () => {
+      const mockImcDto = {
+        height: 1.78,
+        weight: 120,
+        userId: '123456',
       };
-      const mockResponse = { id: '1', ...mockUserDto };
+      const mockResponse = { id: '1', ...mockImcDto };
 
-      (NewUserUseCase.prototype.execute as jest.Mock).mockResolvedValue(
+      (NewRecordImcUseCase.prototype.execute as jest.Mock).mockResolvedValue(
         mockResponse,
       );
 
-      const result = await controller.newUser(
-        mockUserDto.name,
-        mockUserDto.email,
-        mockUserDto.password,
-        mockPasswordHashService,
+      const result = await controller.newRecordImcCalc(
+        mockImcDto.height,
+        mockImcDto.weight,
+        mockImcDto.userId,
       );
 
-      expect(NewUserUseCase).toHaveBeenCalledWith(
-        mockUserRepository,
+      expect(NewRecordImcUseCase).toHaveBeenCalledWith(
+        mockImcRepository,
         mockDomainController,
-        mockPasswordHashService,
       );
       expect(result).toEqual(mockResponse);
     });
 
-    it('should throw an error if NewUserUseCase fails', async () => {
-      (NewUserUseCase.prototype.execute as jest.Mock).mockRejectedValue(
-        new Error('User creation failed'),
+    it('should throw an error if new-record-use-case fails', async () => {
+      (NewRecordImcUseCase.prototype.execute as jest.Mock).mockRejectedValue(
+        new Error('Record creation failed'),
       );
 
       await expect(
-        controller.newUser(
-          'Test User',
-          'test@example.com',
-          '123456',
-          mockPasswordHashService,
-        ),
+        controller.newRecordImcCalc(1.8, 120, '123456'),
       ).rejects.toThrow('User creation failed');
     });
   });
@@ -91,45 +68,29 @@ describe('ApplicationController', () => {
   describe('login', () => {
     it('should return a valid token', async () => {
       const mockEmail = 'test@example.com';
-      const mockPassword = '123456';
       const mockToken = 'mocked-jwt-token';
 
-      (SignInUseCase.prototype.execute as jest.Mock).mockResolvedValue({
+      (RecordsImcUseCase.prototype.execute as jest.Mock).mockResolvedValue({
         token: mockToken,
       });
 
-      const result = await controller.login(
-        mockEmail,
-        mockPassword,
-        mockJwtService,
-        mockUserService,
-        mockPasswordHashService,
-      );
+      const result = await controller.listRecordsImc(mockEmail);
 
-      expect(SignInUseCase).toHaveBeenCalledWith(
-        mockUserRepository,
+      expect(RecordsImcUseCase).toHaveBeenCalledWith(
+        mockImcRepository,
         mockDomainController,
-        mockJwtService,
-        mockUserService,
-        mockPasswordHashService,
       );
       expect(result).toBe(mockToken);
     });
 
-    it('should throw an error if SignInUseCase fails', async () => {
-      (SignInUseCase.prototype.execute as jest.Mock).mockRejectedValue(
+    it('should throw an error if RecordsImcUseCase fails', async () => {
+      (RecordsImcUseCase.prototype.execute as jest.Mock).mockRejectedValue(
         new Error('Invalid credentials'),
       );
 
-      await expect(
-        controller.login(
-          'test@example.com',
-          '123456',
-          mockJwtService,
-          mockUserService,
-          mockPasswordHashService,
-        ),
-      ).rejects.toThrow('Invalid credentials');
+      await expect(controller.listRecordsImc('123456')).rejects.toThrow(
+        'Invalid user ID',
+      );
     });
   });
 });
