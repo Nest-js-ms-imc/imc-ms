@@ -19,9 +19,11 @@ export class ImcRepository implements IImcRepository<ImcModel> {
 
   async recordImc(imc: ImcApplicationDto): Promise<ImcModel> {
     try {
+      const position = await this.getPosition(imc);
+
       const data = this.mapImcApplicationDtoToImcModel({
         ...imc,
-        position: await this.getPosition(imc),
+        position,
       });
 
       return await this.repository.save(data);
@@ -42,7 +44,6 @@ export class ImcRepository implements IImcRepository<ImcModel> {
   private mapImcApplicationDtoToImcModel(data: ImcApplicationDto): ImcModel {
     const imc = new ImcModel();
     const height = data.height;
-    //TODO: Falta pruebas unitarias
 
     imc.id = data.id;
     imc.createdAt = new Date();
@@ -66,17 +67,21 @@ export class ImcRepository implements IImcRepository<ImcModel> {
         }
         return map;
       }, new Map()),
-    )
-      .map(([, record]) => record)
-      .filter((record) => record.userId !== imc.userId);
+    ).map(([, record]) => record);
 
-    lastRecords.push(this.mapImcApplicationDtoToImcModel(imc));
+    const newImcModel = this.mapImcApplicationDtoToImcModel(imc);
 
+    const userAlreadyExists = lastRecords.some(
+      (record) => record.userId === imc.userId,
+    );
+    if (!userAlreadyExists) return -1;
+
+    lastRecords.push(newImcModel);
     lastRecords.sort((a, b) => (a.imc ?? 0) - (b.imc ?? 0));
 
     const position =
       lastRecords.findIndex((record) => record.userId === imc.userId) + 1;
 
-    return position || -1;
+    return position;
   }
 }

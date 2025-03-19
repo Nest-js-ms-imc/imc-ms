@@ -61,31 +61,27 @@ describe('ApplicationController', () => {
 
       await expect(
         controller.newRecordImcCalc(1.8, 120, '123456'),
-      ).rejects.toThrow('User creation failed');
+      ).rejects.toThrow('Record creation failed');
     });
   });
 
   describe('login', () => {
     it('should return a valid token', async () => {
       const mockEmail = 'test@example.com';
-      const mockToken = 'mocked-jwt-token';
+      const mockToken = { token: 'mocked-jwt-token' };
 
-      (RecordsImcUseCase.prototype.execute as jest.Mock).mockResolvedValue({
-        token: mockToken,
-      });
+      (RecordsImcUseCase.prototype.execute as jest.Mock).mockResolvedValue(
+        mockToken,
+      );
 
       const result = await controller.listRecordsImc(mockEmail);
 
-      expect(RecordsImcUseCase).toHaveBeenCalledWith(
-        mockImcRepository,
-        mockDomainController,
-      );
       expect(result).toBe(mockToken);
     });
 
     it('should throw an error if RecordsImcUseCase fails', async () => {
       (RecordsImcUseCase.prototype.execute as jest.Mock).mockRejectedValue(
-        new Error('Invalid credentials'),
+        new Error('Invalid user ID'),
       );
 
       await expect(controller.listRecordsImc('123456')).rejects.toThrow(

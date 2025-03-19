@@ -11,7 +11,7 @@ import { ImcRepository } from './persistence/repositories/imc.repository';
 import { ImcController } from './controllers/imc.controller';
 import { ImcModel } from './persistence/models/imc.model';
 
-jest.mock('./persistence/repositories/user.repository');
+jest.mock('./persistence/repositories/imc.repository');
 
 describe('InfraestructureModule', () => {
   let module: TestingModule;

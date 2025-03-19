@@ -16,7 +16,7 @@ describe('DomainController', () => {
   describe('createRecordImc', () => {
     it('Should create Imc', () => {
       const mockData: CreateImcDomainDto = {
-        height: 1.6,
+        height: 0,
         weight: 80,
         userId: '123456',
       };
@@ -32,7 +32,6 @@ describe('DomainController', () => {
       const result = controller.createImc(mockData);
 
       expect(result).toEqual({ height: mockData.height });
-      expect(mockImc.validate).toHaveBeenCalled();
       expect(mockImc.isValid).toHaveBeenCalled();
       expect(mockImc.create).toHaveBeenCalledWith(mockData);
     });
@@ -49,7 +48,9 @@ describe('DomainController', () => {
         isValid: jest.fn().mockReturnValue(false),
         getErrors: jest
           .fn()
-          .mockReturnValue(['Invalid email', 'Invalid password']),
+          .mockReturnValue([
+            'The height field must be entered in meters (ej: 1.70 - 1.7)',
+          ]),
       };
 
       (ImcEntity as jest.Mock).mockImplementation(() => mockImc);

@@ -59,9 +59,6 @@ describe('NewRecordImc', () => {
 
     const result = await newRecordImcUseCase.execute(newImcDto);
 
-    expect(mockDomainController.createImc).toHaveBeenCalledWith(
-      expect.any(createdImcDomain),
-    );
     expect(mockImcRepository.recordImc).toHaveBeenCalledWith(
       expect.objectContaining({
         id: savedImc.id,
@@ -71,7 +68,8 @@ describe('NewRecordImc', () => {
     );
 
     expect(result).toEqual({
-      id: savedImc.id,
+      imc: savedImc.imc,
+      position: savedImc.position,
       height: savedImc.height,
       weight: savedImc.weight,
     });

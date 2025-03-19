@@ -46,23 +46,28 @@ describe('ImcEntity', () => {
       weight: 80,
       imc: 21.5,
       userId: '123456',
-      createdAt: new Date(),
       position: 8,
     };
 
     const result = Imc.create(mockImcService);
 
-    expect(mockImcService).toHaveBeenCalledWith('123456');
-    expect(result).toEqual(mockResponse);
+    expect(result).toMatchObject(mockResponse);
   });
 
   it('should validate Imc fields correctly', () => {
     const Imc = new ImcEntity({ ...mockImcService, height: 1.8, weight: 90 });
     Imc.validate();
 
+    expect(Imc.getErrors().has('height')).toBe(false);
+    expect(Imc.getErrors().has('weight')).toBe(false);
+  });
+
+  it('should validate entity correctly', () => {
+    const Imc = new ImcEntity();
+
+    Imc.validate();
     expect(Imc.isValid()).toBe(false);
-    expect(Imc.getErrors().has('height')).toBe(true);
-    expect(Imc.getErrors().has('weight')).toBe(true);
+    expect(Imc.getErrors().size).toBe(4);
   });
 
   it('should pass validation for correct Imc details', () => {

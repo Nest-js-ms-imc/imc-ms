@@ -22,9 +22,6 @@ export function IsFloatWithOneOrTwoDecimals(
             /^[0-9]\.\d{1,2}$/.test(value.toString())
           );
         },
-        defaultMessage(): string {
-          return 'The height field must be entered in meters (ej: 1.70 - 1.7)';
-        },
       },
     });
   };
