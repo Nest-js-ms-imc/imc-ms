@@ -1,6 +1,7 @@
 import { IImcRepository } from '../persistence/repositories/imc.repository';
 import { IImcModel } from '../persistence/models/imc.model';
 import { ImcApplicationDto, ListRecordsImcApplicationDto } from '../dto';
+import { UseCaseException } from '../exceptions/use-case.exception';
 
 export class RecordsImcUseCase {
   constructor(private readonly imcRepository: IImcRepository<IImcModel>) {}
@@ -10,9 +11,9 @@ export class RecordsImcUseCase {
   ): Promise<ImcApplicationDto[]> {
     const registersDto = await this.imcRepository.findRecordsById(user);
 
-    // if (!registersDto) {
-    //   throw new UseCaseException('No records');
-    // }
+    if (!registersDto) {
+      throw new UseCaseException('No records');
+    }
 
     const registers = this.mapImcDtoToApplication(registersDto);
 

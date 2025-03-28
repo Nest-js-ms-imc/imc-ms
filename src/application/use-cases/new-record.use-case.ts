@@ -3,6 +3,7 @@ import { IImcModel } from '../persistence/models/imc.model';
 import { ImcApplicationDto, NewRecordImcApplicationDto } from '../dto';
 import { Domain } from '../../domain/domain.interface';
 import { CreateImcDomainDto } from '../../domain/dto/create-record.dto';
+import { UseCaseException } from '../exceptions/use-case.exception';
 
 export class NewRecordImcUseCase {
   constructor(
@@ -14,6 +15,10 @@ export class NewRecordImcUseCase {
     newRecordImcDto: NewRecordImcApplicationDto,
   ): Promise<ImcApplicationDto> {
     const newImc = this.mapImcDtoToDomain(newRecordImcDto);
+
+    if (!newImc) {
+      throw new UseCaseException('Invalid data');
+    }
 
     const data = await this.domainController.createImc(newImc);
     const imc = this.mapImcDtoToPersistence(data);
