@@ -78,7 +78,7 @@ export class ImcRepository implements IImcRepository<ImcModel> {
     // );
 
     listLastRecordEachUser.push(newImcModel);
-    listLastRecordEachUser.sort((a, b) => (a.imc ?? 0) - (b.imc ?? 0));
+    listLastRecordEachUser.sort((a, b) => a.imc - b.imc);
 
     return (
       listLastRecordEachUser.findIndex(

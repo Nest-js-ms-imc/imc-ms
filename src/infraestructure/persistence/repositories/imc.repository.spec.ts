@@ -84,7 +84,7 @@ describe('ImcRepository', () => {
           height: 1.7,
           weight: 80,
           imc: 27.7,
-          position: 1,
+          position: 2,
           userId: 'user123',
         }),
       );
@@ -246,6 +246,6 @@ describe('ImcRepository', () => {
 
     const position = await imcRepository['getPosition'](dto);
 
-    expect(position).toBe(-1);
+    expect(position).toBe(2);
   });
 });
