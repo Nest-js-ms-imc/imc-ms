@@ -24,27 +24,37 @@ export class EnvsService implements OnModuleInit {
   }
 
   async loadSecrets(): Promise<void> {
-    const secretString = await this.secretsService.getSecret('imc-secrets');
+    const rawString = await this.secretsService.getSecret('imc-secrets');
 
-    // console.log('🔹 Secretos cargados en EnvsService:', secretString);
+    // this.logger.log('🔹 Secretos cargados en EnvsService:', rawString);
 
-    if (!secretString) {
-      throw new Error('No se pudieron obtener los secretos de AWS');
+    if (!rawString) {
+      throw new Error('Secrets are empty or undefined');
     }
 
-    const secretsString = secretString.replace(/^'{|}'$/g, '');
+    const cleanedString = rawString.replace(/^'{|}'$/g, '');
 
-    const secretJson = secretsString.replace(
-      /(\w+):([^,{}]+)/g,
-      (match, key, value) => {
-        if (!isNaN(Number(value))) {
-          return `"${key}":${value}`;
-        }
-        return `"${key}":"${value}"`;
-      },
+    // this.logger.log(`🔹 EnvsService cleanedString:`, { cleanedString });
+
+    const fixedJson = Object.fromEntries(
+      cleanedString.split(',').map((pair) => {
+        const [key, value] = pair.split(';');
+        return [key, value];
+      }),
     );
 
-    const parsedSecrets = JSON.parse(`{${secretJson}}`);
+    // console.log(JSON.stringify(fixedJson, null, 2));
+
+    // this.logger.log(
+    //   `🔹 EnvsService fixedJson:`,
+    //   { cleanedString },
+    //   { fixedJson },
+    // );
+
+    // const parsedObject = JSON.parse(fixedJson);
+    const parsedObject = fixedJson;
+
+    // this.logger.log(`🔹 EnvsService parsedObject:`, { parsedObject });
 
     const envsSchema = joi
       .object({
@@ -54,10 +64,11 @@ export class EnvsService implements OnModuleInit {
         DB_USERNAME: joi.string().required(),
         DB_PASSWORD: joi.string().required(),
         DB_PORT: joi.number().required(),
+        NATS_SERVERS: joi.string().required(),
       })
       .unknown(true);
 
-    const { error, value } = envsSchema.validate(parsedSecrets, {
+    const { error, value } = envsSchema.validate(parsedObject, {
       abortEarly: false,
     });
 
@@ -67,11 +78,11 @@ export class EnvsService implements OnModuleInit {
 
     this.envConfig = value;
 
-    // console.log('EnvsService values: ', { value });
+    // this.logger.log('EnvsService values: ', { value });
   }
 
   get(key: string): string {
-    // console.log(`🔹 Buscando variable ${key}:`, key, this.envConfig);
+    // this.loggerconsole.log(`🔹 Buscando variable ${key}:`, key, this.envConfig);
 
     return this.envConfig[key];
   }

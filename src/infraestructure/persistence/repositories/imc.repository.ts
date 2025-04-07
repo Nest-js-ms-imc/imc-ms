@@ -59,7 +59,7 @@ export class ImcRepository implements IImcRepository<ImcModel> {
   private async getPosition(imc: ImcApplicationDto): Promise<number> {
     const records = await this.repository.find();
 
-    const lastRecords = Array.from(
+    const listLastRecordEachUser = Array.from(
       records.reduce((map, record) => {
         const current = map.get(record.userId);
         if (!current || record.createdAt > current.createdAt) {
@@ -67,21 +67,35 @@ export class ImcRepository implements IImcRepository<ImcModel> {
         }
         return map;
       }, new Map()),
-    ).map(([, record]) => record);
+    )
+      .map(([, record]) => record)
+      .filter((user) => user.userId !== imc.userId);
 
     const newImcModel = this.mapImcApplicationDtoToImcModel(imc);
 
-    const userAlreadyExists = lastRecords.some(
-      (record) => record.userId === imc.userId,
+    // const userRecords = listLastRecordEachUser.filter(
+    //   (record) => record.userId === imc.userId,
+    // );
+
+    listLastRecordEachUser.push(newImcModel);
+    listLastRecordEachUser.sort((a, b) => (a.imc ?? 0) - (b.imc ?? 0));
+
+    return (
+      listLastRecordEachUser.findIndex(
+        (record) => record.userId === imc.userId,
+      ) + 1
     );
-    if (!userAlreadyExists) return -1;
 
-    lastRecords.push(newImcModel);
-    lastRecords.sort((a, b) => (a.imc ?? 0) - (b.imc ?? 0));
+    // if (!userRecords) {
+    //   return listLastRecordEachUser.findIndex((record) => record.userId === imc.userId) + 1;
+    // } else {
+    //   const mostRecent = userRecords.reduce((latest, current) => {
+    //     return new Date(current.date) > new Date(latest.date)
+    //       ? current
+    //       : latest;
+    //   });
 
-    const position =
-      lastRecords.findIndex((record) => record.userId === imc.userId) + 1;
-
-    return position;
+    //   return allRecords.findIndex((r) => r.id === mostRecent.id);
+    // }
   }
 }

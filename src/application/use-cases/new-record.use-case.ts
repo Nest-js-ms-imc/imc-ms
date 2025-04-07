@@ -16,10 +16,6 @@ export class NewRecordImcUseCase {
   ): Promise<ImcApplicationDto> {
     const newImc = this.mapImcDtoToDomain(newRecordImcDto);
 
-    if (!newImc) {
-      throw new UseCaseException('Invalid data');
-    }
-
     const data = await this.domainController.createImc(newImc);
     const imc = this.mapImcDtoToPersistence(data);
     const imcDto = await this.imcRepository.recordImc(imc);

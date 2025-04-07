@@ -1,4 +1,5 @@
 import { Controller, Body, Post, Get } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 import { Application } from '../../application/application.interface';
 import { RecordImcDto, RecordsImcDomainDto } from '../../domain/dto';
@@ -7,31 +8,21 @@ import { RecordImcDto, RecordsImcDomainDto } from '../../domain/dto';
 export class ImcController {
   constructor(private readonly application: Application) {}
 
-  // @MessagePattern('imc.new.record')
-  // newRecord(@Payload() recordImcDto: RecordImcDto) {
-  @Post('new-record')
-  async registerImc(@Body() recordImcDto: RecordImcDto) {
-    try {
-      const data = await this.application.newRecordImcCalc(
-        recordImcDto.height,
-        recordImcDto.weight,
-        recordImcDto.userId,
-      );
-      return data;
-    } catch (error) {
-      console.error(error, recordImcDto);
-    }
+  @MessagePattern('imc.new.record')
+  async registerImc(@Payload() recordImcDto: RecordImcDto) {
+    // @Post('new-record')
+    // async registerImc(@Body() recordImcDto: RecordImcDto) {
+    return await this.application.newRecordImcCalc(
+      recordImcDto.height,
+      recordImcDto.weight,
+      recordImcDto.userId,
+    );
   }
 
-  // @MessagePattern('imc.list.records')
-  // listRecords(@Payload() user: RecordsImcDomainDto) {
-  @Get('list-records')
-  async listRecords(@Body() user: RecordsImcDomainDto) {
-    try {
-      const data = await this.application.listRecordsImc(user.id);
-      return data;
-    } catch (error) {
-      console.error(error, user);
-    }
+  @MessagePattern('imc.list.records')
+  async listRecords(@Payload() user: RecordsImcDomainDto) {
+    // @Get('list-records')
+    // async listRecords(@Body() user: RecordsImcDomainDto) {
+    return await this.application.listRecordsImc(user.id);
   }
 }

@@ -38,4 +38,10 @@ describe('RecordsImcUseCase', () => {
     expect(result[0]).toBeInstanceOf(ImcApplicationDto);
     expect(result[0].imc).toBe(22.9);
   });
+
+  it('should throw UseCaseException if mapped DTO is invalid', async () => {
+    const dto = null;
+
+    await expect(useCase.execute(dto)).rejects.toThrow('No records');
+  });
 });

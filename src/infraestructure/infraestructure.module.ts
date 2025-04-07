@@ -8,9 +8,10 @@ import { Domain } from '../domain/domain.interface';
 import { SecretsModule } from './secrets/aws-secrets.module';
 import { ImcController } from './controllers/imc.controller';
 import { ImcRepository } from './persistence/repositories/imc.repository';
+import { NatsModule } from './transports/nats.module';
 
 @Module({
-  imports: [SecretsModule, PersistenceModule],
+  imports: [SecretsModule, NatsModule, PersistenceModule],
   controllers: [ImcController],
   providers: [
     {

@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Application } from '../../application/application.interface';
 import { ImcController } from './imc.controller';
 import { RecordImcDto, RecordsImcDomainDto } from '../../domain/dto';
+import { RpcException } from '@nestjs/microservices';
+import { UseCaseException } from '../../application/exceptions/use-case.exception';
 
 describe('ImcController', () => {
   let imcController: ImcController;
@@ -45,18 +47,15 @@ describe('ImcController', () => {
   });
 
   it('should handle errors in list of records', async () => {
-    const dto: RecordsImcDomainDto = {
+    const dto = {
       id: '123456',
     };
-
     const error = new Error('No records');
-    applicationMock.listRecordsImc.mockRejectedValue(error);
+    jest.spyOn(applicationMock, 'listRecordsImc').mockRejectedValue(error);
 
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    await imcController.listRecords(dto);
-
-    expect(console.error).toHaveBeenCalledWith(error, { id: '123456' });
+    await expect(imcController.listRecords(dto)).rejects.toThrow('No records');
   });
 
   it('should handle errors in new record imc and log them', async () => {
@@ -67,16 +66,12 @@ describe('ImcController', () => {
     };
 
     const error = new Error('Record imc failed');
-    applicationMock.newRecordImcCalc.mockRejectedValue(error);
+    jest.spyOn(applicationMock, 'newRecordImcCalc').mockRejectedValue(error);
 
-    const consoleErrorSpy = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    await imcController.registerImc(registerDto);
-
-    expect(consoleErrorSpy).toHaveBeenCalledWith(error, registerDto);
-
-    consoleErrorSpy.mockRestore();
+    await expect(imcController.registerImc(registerDto)).rejects.toThrow(
+      'Record imc failed',
+    );
   });
 });

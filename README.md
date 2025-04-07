@@ -20,7 +20,7 @@ docker compose up -d
 4. Crear los secrets
 
 ```
-aws secretsmanager create-secret --name imc-secrets --secret-string '{"PORT":"3001","DB_USERNAME":"postgres","DB_PASSWORD":"M1S3Cr37P4s5w0rd","DB_NAME":"ImcDB","DB_HOST":"localhost","DB_PORT":"5434"}' --endpoint-url http://localhost:4566
+aws secretsmanager create-secret --name imc-secrets --secret-string '{"PORT":"3001","DB_USERNAME":"postgres","DB_PASSWORD":"M1S3Cr37P4s5w0rd","DB_NAME":"ImcDB","DB_HOST":"localhost","DB_PORT":"5434","NATS_SERVERS":"nats://localhost:4222**nats://localhost:4223"}' --endpoint-url http://localhost:4566
 ```
 
 # AWS Secrets Connection
@@ -34,11 +34,16 @@ Format: json
 
 # Crear secrets
 
-aws secretsmanager create-secret --name imc-secrets --secret-string '{"PORT":"3001","DB_USERNAME":"postgres","DB_PASSWORD":"M1S3Cr37P4s5w0rd","DB_NAME":"ImcDB","DB_HOST":"localhost","DB_PORT":"5434"}' --endpoint-url http://localhost:4566
+```
+aws secretsmanager create-secret --name imc-secrets --secret-string '{"PORT";"3001","DB_USERNAME";"postgres","DB_PASSWORD";"M1S3Cr37P4s5w0rd","DB_NAME";"ImcDB","DB_HOST";"localhost","DB_PORT";"5434","NATS_SERVERS";"nats://localhost:4222**nats://localhost:4223"}' --endpoint-url http://localhost:4566
+```
 
 # Actualizar secrets
 
-aws secretsmanager update-secret --secret-id imc-secrets --secret-string '{"PORT":"3001","DB_USERNAME":"postgres","DB_PASSWORD":"M1S3Cr37P4s5w0rd","DB_NAME":"ImcDB","DB_HOST":"localhost","DB_PORT":"5434"}' --endpoint-url http://localhost:4566
+```
+aws secretsmanager update-secret --secret-id imc-secrets --secret-string '{"PORT";"3001","DB_USERNAME";"postgres","DB_PASSWORD";"M1S3Cr37P4s5w0rd","DB_NAME";"ImcDB","DB_HOST";"localhost","DB_PORT";"5434","NATS_SERVERS";"nats://localhost:4222**nats://localhost:4223"}' --endpoint-url http://localhost:4566
+
+```
 
 # Listar secrets
 
